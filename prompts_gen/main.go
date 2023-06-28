@@ -13,9 +13,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-const apiKey = "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"
-
-// const apiKey = ""
+const apiKey = "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"
 
 func genPrompts(theme string) string {
 	contextTxt := `Stable Diffusion is an AI art generation model similar to DALLE-2.
@@ -82,19 +80,17 @@ func saveEncodedImage(b64Image string, outputPath string) error {
 	}
 	return nil
 }
-
-func main() {
-	theme := "Be bright. Be bold, be yourself."
+func genImage(theme string, maxNum int) {
 	prompt := genPrompts(theme)
 	fmt.Println(prompt)
 
 	remoteURL := "http://180.164.99.89:37861/"
 	txt2imgURL := remoteURL + "sdapi/v1/txt2img"
 	data := map[string]interface{}{
-		"prompt":              prompt,
+		"prompt":              theme,
 		"negative_prompt":     "((part of the head)), ((((mutated hands and fingers)))), deformed, blurry, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long neck, long body, Octane renderer,lowres, bad anatomy, bad hands, text, missing fingers, worst quality, low quality, normal quality, signature, watermark, blurry,ugly, fat, obese, chubby, (((deformed))), [blurry], bad anatomy, disfigured, poorly drawn face, mutation, mutated, (extra_limb), (ugly), (poorly drawn hands), messy drawing,(2girls), morbid, mutilated, tranny, trans, trannsexual, [out of frame], (bad proportions), octane render, unity, unreal, maya, photorealistic",
 		"num_inference_steps": "30",
-		"samples":             "2",
+		"samples":             maxNum,
 	}
 
 	response, err := submitPost(txt2imgURL, data)
@@ -115,11 +111,18 @@ func main() {
 	}
 
 	images := result["images"].([]interface{})
-	for num, image := range images {
-		err = saveEncodedImage(image.(string), strconv.Itoa(num)+"_wish.png")
+	i := 0
+	for _, image := range images {
+		fmt.Println(i)
+		i++
+		err = saveEncodedImage(image.(string), strconv.Itoa(i)+"_wish.png")
 		if err != nil {
 			panic(err)
 		}
 	}
-
+}
+func main() {
+	theme := "Be bright. Be bold, be yourself."
+	imageNum := 3
+	genImage(theme, imageNum)
 }
