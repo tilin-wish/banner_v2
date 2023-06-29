@@ -1,4 +1,4 @@
-package main
+package prompts
 
 import (
 	"context"
@@ -7,15 +7,26 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
+	"github.com/joho/godotenv"
 	openai "github.com/sashabaranov/go-openai"
 )
 
-const apiKey = "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"
+var apiKey string
 
-func genPrompts(theme string) string {
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	apiKey = os.Getenv("API_KEY")
+}
+
+func GenPrompts(theme string) string {
 	contextTxt := `Stable Diffusion is an AI art generation model similar to DALLE-2.
 Here are some prompts for generating art with Stable Diffusion. 
 The generated picture is used for the Banner of an e-commerce web App, and the style cannot be gloomy or revealing, and there is no clear frontal face of the person.
@@ -80,8 +91,9 @@ func saveEncodedImage(b64Image string, outputPath string) error {
 	}
 	return nil
 }
-func genImage(theme string, maxNum int) {
-	prompt := genPrompts(theme)
+
+func GenImage(theme string, maxNum int) {
+	prompt := GenPrompts(theme)
 	fmt.Println(prompt)
 
 	remoteURL := "http://180.164.99.89:37861/"
@@ -120,9 +132,4 @@ func genImage(theme string, maxNum int) {
 			panic(err)
 		}
 	}
-}
-func main() {
-	theme := "Be bright. Be bold, be yourself."
-	imageNum := 3
-	genImage(theme, imageNum)
 }
