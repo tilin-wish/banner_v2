@@ -44,7 +44,7 @@ const ImagePanel = () => {
       }
       return (
         <div className="h-10 flex items-center gap-1">
-          <p className="label-text text-black font-bold text-lg">Progress</p>
+          <p className="label-text text-black font-bold text-lg">Generating</p>
           <progress
             className="progress w-56 h-4"
             value={value}
@@ -53,6 +53,9 @@ const ImagePanel = () => {
         </div>
       );
     }
+
+    if (!data?.url) return null;
+
     return (
       <div className="flex h-10 items-center gap-1">
         <span className="label-text text-black font-bold text-lg pr-1">

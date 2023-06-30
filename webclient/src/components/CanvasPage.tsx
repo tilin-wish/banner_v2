@@ -12,7 +12,7 @@ import QuillEditor from "./QuillEditor";
 
 const GeneratedImage = ({ src }: { src: string }) => {
   const [image] = useImage(src);
-  return <Image image={image} width={800} height={600} />;
+  return <Image image={image} width={700} height={700} />;
 };
 
 const TextImage = () => {
@@ -42,7 +42,6 @@ const TextImage = () => {
     <Image
       image={image}
       draggable
-      // fill={imageState.isDragging ? "green" : "transparent"}
       fill="transparent"
       onDragStart={() => setImageState({ ...imageState, isDragging: true })}
       onDragEnd={(e) =>
@@ -93,12 +92,6 @@ const CanvasPage = () => {
         <Link to="/">
           <button className="btn btn-sm btn-neutral">Go Back</button>
         </Link>
-        <button
-          className={`btn btn-sm btn-primary 
-          ${data?.url ? "" : "disabled"}`}
-        >
-          Download
-        </button>
       </div>
       <div className="w-full flex h-full">
         {!isFetching ? (
@@ -106,16 +99,17 @@ const CanvasPage = () => {
           Layer - is an actual 2d canvas element, so you can have several layers inside the stage
           Rect and Circle are not DOM elements. 
           They are 2d shapes on canvas */
-          <Stage width={800} height={600}>
+          <Stage width={700} height={600}>
             {data?.url && (
               <Layer>
                 <GeneratedImage src={data.url} />
+
                 <TextImage />
               </Layer>
             )}
           </Stage>
         ) : (
-          <div className="w-[600px] h-[600px] flex justify-center">
+          <div className="w-[800px] h-[600px] flex justify-center">
             <span className="loading loading-spinner text-neutral" />
           </div>
         )}

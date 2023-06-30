@@ -5,14 +5,21 @@ import { useDebouncedCallback } from "use-debounce";
 import useAppState from "../store";
 
 // 自定义文字大小
-const fontSizeAttr = ['10px', '12px', '14px', '16px', '20px', '24px', '36px']
-const Size = Quill.import("attributors/style/size")
-Size.whitelist = fontSizeAttr
-Quill.register(Size, true)
+const fontSizeAttr = ["10px", "12px", "14px", "16px", "20px", "24px", "36px"];
+const Size = Quill.import("attributors/style/size");
+Size.whitelist = fontSizeAttr;
+Quill.register(Size, true);
 
-const fontAttr = ["arial", "comic-sans", "courier-new", "georgia", "helvetica", "lucida"]
-const Font = Quill.import('formats/font')
-Font.whitelist = fontAttr
+const fontAttr = [
+  "arial",
+  "comic-sans",
+  "courier-new",
+  "georgia",
+  "helvetica",
+  "lucida",
+];
+const Font = Quill.import("formats/font");
+Font.whitelist = fontAttr;
 Quill.register(Font, true);
 
 const QuillEditor = () => {
@@ -44,14 +51,14 @@ const QuillEditor = () => {
           ],
           [
             {
-              size: fontSizeAttr
-            }
+              size: fontSizeAttr,
+            },
           ],
           [
             {
-              font: fontAttr
-            }
-          ]
+              font: fontAttr,
+            },
+          ],
         ],
       },
       clipboard: {
@@ -62,7 +69,7 @@ const QuillEditor = () => {
   );
 
   return (
-    <div className="bg-gray-100 flex-grow">
+    <div className="bg-gray-100 w-1/2">
       <ReactQuill
         theme="snow"
         defaultValue={promptText}

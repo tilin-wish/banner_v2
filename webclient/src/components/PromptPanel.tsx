@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import useAppState from "../store";
 import PanelContainer from "./PanelContainer";
 
@@ -23,10 +23,11 @@ const PromptPanel = () => {
   const setPromptText = useAppState((state) => state.setPromptText);
   const setPredicationId = useAppState((state) => state.setTaskId);
   const textRef = useRef<HTMLTextAreaElement>(null);
+  const [text, setText] = useState("");
 
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: ["images", textRef.current?.value],
-    enabled: false,
+  const { data, isFetching } = useQuery({
+    queryKey: ["images", text],
+    enabled: !!text,
     retry: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
@@ -85,9 +86,12 @@ const PromptPanel = () => {
             <button
               className="btn btn-neutral"
               disabled={isFetching}
-              onClick={() => {
-                refetch();
+              onClick={(e) => {
                 setPromptText(undefined);
+                const textValue = textRef.current?.value;
+                if (textValue) {
+                  setText(textValue);
+                }
               }}
             >
               {isFetching ? "Generating" : "Genereate Prompt"}
