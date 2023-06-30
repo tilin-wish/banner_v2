@@ -23,8 +23,34 @@ func init() {
 
 	apiKey = os.Getenv("API_KEY")
 }
+func GenBanners(theme string) string {
+	contextTxt := `Give me a banner about ` + theme + `on the e-commerce platform, with no more than 15 words.`
 
-func GenPrompts(theme string) string {
+	client := openai.NewClient(apiKey)
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    openai.ChatMessageRoleAssistant,
+					Content: contextTxt,
+				},
+			},
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("ChatCompletion error: %v\n", err)
+		return ""
+	}
+
+	resTheme := resp.Choices[0].Message.Content
+	return resTheme
+}
+func GenPrompts(themeReq string) string {
+	theme := GenBanners(themeReq)
+	time.Sleep(1 * time.Second)
 	contextTxt := `You will now act as a prompt generator for a generative AI called “Midjourney”. Midjourney AI generates images based on given prompts.
 
 	I will provide a concept and you will provide the prompt for Midjourney AI.
@@ -85,7 +111,7 @@ func GenPrompts(theme string) string {
 	}
 
 	prompt := resp.Choices[0].Message.Content
-	return prompt
+	return prompt, theme
 }
 
 func submitPost(url string, data map[string]interface{}) (*http.Response, error) {
@@ -121,8 +147,9 @@ type GenImageResponse struct {
 }
 
 func GenImage(theme string) (*GenImageResponse, error) {
-	prompt := GenPrompts(theme)
+	prompt, theme := GenPrompts(theme)
 	fmt.Println(prompt)
+	fmt.Println(theme)
 	task, err := submitPrompt(prompt)
 	if err != nil {
 		return nil, err
