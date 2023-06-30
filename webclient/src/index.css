@@ -5,3 +5,86 @@
 .ql-container.ql-snow {
   border: none
 }
+
+/*
+  文字大小
+*/
+.ql-snow .ql-picker.ql-size{
+  width: 70px;
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='10px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='10px']::before {
+  content: '10px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='12px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='12px']::before {
+  content: '12px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='14px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='14px']::before {
+  content: '14px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='16px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='16px']::before {
+  content: '16px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='20px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='20px']::before {
+  content: '20px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='24px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='24px']::before {
+  content: '24px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='36px']::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='36px']::before {
+  content: '36px';
+}
+
+.ql-font-arial,
+.ql-picker.ql-font .ql-picker-label[data-value="arial"]::before, 
+.ql-picker.ql-font .ql-picker-item[data-value="arial"]::before
+{
+    font-family: Arial, sans-serif;
+    content: "arial" !important;
+}
+
+.ql-font-comic-sans,
+.ql-picker.ql-font .ql-picker-label[data-value="comic-sans"]::before, 
+.ql-picker.ql-font .ql-picker-item[data-value="comic-sans"]::before
+{
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    content: "comic-sans" !important;
+}
+
+.ql-font-courier-new,
+.ql-picker.ql-font .ql-picker-label[data-value="courier-new"]::before, 
+.ql-picker.ql-font .ql-picker-item[data-value="courier-new"]::before
+{
+    font-family: "Courier New";
+    content: "courier-new" !important;
+}
+
+.ql-font-georgia,
+.ql-picker.ql-font .ql-picker-label[data-value="georgia"]::before, 
+.ql-picker.ql-font .ql-picker-item[data-value="georgia"]::before
+{
+    font-family: Georgia, serif;
+    content: "georgia" !important;
+}
+
+.ql-font-helvetica,
+.ql-picker.ql-font .ql-picker-label[data-value="helvetica"]::before, 
+.ql-picker.ql-font .ql-picker-item[data-value="helvetica"]::before
+{
+    font-family: Helvetica, sans-serif;
+    content: "helvetica" !important;
+}
+
+.ql-font-lucida,
+.ql-picker.ql-font .ql-picker-label[data-value="lucida"]::before, 
+.ql-picker.ql-font .ql-picker-item[data-value="lucida"]::before
+{
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    content: "lucida" !important;
+}
