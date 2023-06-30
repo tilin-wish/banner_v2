@@ -6,6 +6,7 @@ import PanelContainer from "./PanelContainer";
 
 type SubmitPrompt = {
   prompt: string;
+  slogan: string;
   task: {
     code: number;
     task_id: number;
@@ -21,6 +22,7 @@ type SubmitPrompt = {
 
 const PromptPanel = () => {
   const setPromptText = useAppState((state) => state.setPromptText);
+  const setSlogan = useAppState((state) => state.setSlogan);
   const setPredicationId = useAppState((state) => state.setTaskId);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const [text, setText] = useState("");
@@ -44,8 +46,9 @@ const PromptPanel = () => {
     if (data) {
       setPredicationId(data.task.task_id);
       setPromptText(data.prompt);
+      setSlogan(data.slogan);
     }
-  }, [setPromptText, setPredicationId, data]);
+  }, [setPromptText, setPredicationId, setSlogan, data]);
 
   const renderFooter = () => {
     if (isFetching) {

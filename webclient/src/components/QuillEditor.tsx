@@ -23,10 +23,10 @@ Font.whitelist = fontAttr;
 Quill.register(Font, true);
 
 const QuillEditor = () => {
-  const promptText = useAppState((state) => state.promptText);
-  const setPromptText = useAppState((state) => state.setPromptText);
+  const slogan = useAppState((state) => state.slogan);
+  const setSlogan = useAppState((state) => state.setSlogan);
   const debounced = useDebouncedCallback((value: string) => {
-    setPromptText(value);
+    setSlogan(value);
   }, 500);
 
   const modules = useMemo(
@@ -72,8 +72,8 @@ const QuillEditor = () => {
     <div className="bg-gray-100 w-1/2">
       <ReactQuill
         theme="snow"
-        defaultValue={promptText}
-        value={promptText}
+        defaultValue={slogan}
+        value={slogan}
         onChange={debounced}
         modules={modules}
         style={{ height: "100%" }}

@@ -23,7 +23,7 @@ const TextImage = () => {
     y: 50,
   });
 
-  const promptText = useAppState((state) => state.promptText);
+  const slogan = useAppState((state) => state.slogan);
 
   useEffect(() => {
     html2canvas(document.querySelector(".ql-editor")!, {
@@ -36,7 +36,7 @@ const TextImage = () => {
         setImage(canvas);
       })
       .catch((e) => console.log(e));
-  }, [promptText]);
+  }, [slogan]);
 
   return (
     <Image

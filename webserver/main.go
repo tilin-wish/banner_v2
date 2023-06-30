@@ -27,20 +27,6 @@ func main() {
 	log.Fatal(r.Run())
 }
 
-func GetPromptsHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		theme, ok := c.GetQuery("theme")
-		if !ok {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "theme is required"})
-			return
-		}
-		output := prompts.GenPrompts(theme)
-		c.JSON(http.StatusOK, gin.H{
-			"prompts": output,
-		})
-	}
-}
-
 func UpscaleHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		taskID, ok := c.GetQuery("task_id")

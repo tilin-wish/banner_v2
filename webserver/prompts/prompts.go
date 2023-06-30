@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	openai "github.com/sashabaranov/go-openai"
@@ -48,7 +49,7 @@ func GenBanners(theme string) string {
 	resTheme := resp.Choices[0].Message.Content
 	return resTheme
 }
-func GenPrompts(themeReq string) string {
+func GenPrompts(themeReq string) (string, string, error) {
 	theme := GenBanners(themeReq)
 	time.Sleep(1 * time.Second)
 	contextTxt := `You will now act as a prompt generator for a generative AI called “Midjourney”. Midjourney AI generates images based on given prompts.
@@ -76,7 +77,7 @@ func GenPrompts(themeReq string) string {
 	This is your task: You will generate 1 prompts for each concept [1], and your prompts will contain description, environment, atmosphere, and realization.
 	
 	The prompts you provide will be in English*.
-	The content you returned is greater than 900 characters and no more than 1000 characters.
+	The content you returned is greater than 300 characters and no more than 400 characters.
 	
 	Please pay attention:
 	The prompt should adhere to and include all of the following rules:
@@ -107,11 +108,11 @@ func GenPrompts(themeReq string) string {
 
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
-		return ""
+		return "", "", err
 	}
 
 	prompt := resp.Choices[0].Message.Content
-	return prompt, theme
+	return prompt, theme, nil
 }
 
 func submitPost(url string, data map[string]interface{}) (*http.Response, error) {
@@ -143,19 +144,23 @@ func saveEncodedImage(b64Image string, outputPath string) error {
 
 type GenImageResponse struct {
 	Prompt string                `json:"prompt"`
+	Slogan string                `json:"slogan"`
 	Task   *SubmitPromptResponse `json:"task"`
 }
 
 func GenImage(theme string) (*GenImageResponse, error) {
-	prompt, theme := GenPrompts(theme)
-	fmt.Println(prompt)
-	fmt.Println(theme)
+	prompt, slogan, err := GenPrompts(theme)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(prompt, slogan)
 	task, err := submitPrompt(prompt)
 	if err != nil {
 		return nil, err
 	}
 	return &GenImageResponse{
 		Prompt: prompt,
+		Slogan: slogan,
 		Task:   task,
 	}, nil
 }
