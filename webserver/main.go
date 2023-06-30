@@ -18,8 +18,9 @@ func main() {
 	r.Use(cors.Default())
 	api := r.Group("/api")
 	{
-		api.GET("/prompts", GetPromptsHandler())
-		api.GET("/images", GenImageHandler())
+		api.POST("/images", GenImageHandler())
+		api.GET("/tasks", GetTaskHandler())
+		api.GET("/upscale", UpscaleHandler())
 	}
 
 	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
@@ -40,29 +41,77 @@ func GetPromptsHandler() gin.HandlerFunc {
 	}
 }
 
+func UpscaleHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		taskID, ok := c.GetQuery("task_id")
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "taskID is required"})
+			return
+		}
+		id, err := strconv.Atoi(taskID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "task_id must be number "})
+			return
+		}
+		index, ok := c.GetQuery("index")
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "index is required "})
+			return
+		}
+		i, err := strconv.Atoi(index)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "index must be number "})
+			return
+		}
+
+		res, err := prompts.UpscaleImage(id, i)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+
+		c.JSON(http.StatusOK, res)
+	}
+}
+
 func GenImageHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		maxNumParam, ok := c.GetQuery("maxNum")
-		if !ok {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "maxNum is required"})
-			return
-		}
-
-		maxNum, err := strconv.Atoi(maxNumParam)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "maxNum must be number"})
-			return
-		}
-
 		theme, ok := c.GetQuery("theme")
 		if !ok {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "theme is required"})
 			return
 		}
 
-		prompts.GenImage(theme, maxNum)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "success",
-		})
+		res, err := prompts.GenImage(theme)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func GetTaskHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		taskID, ok := c.GetQuery("task_id")
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "theme is required"})
+			return
+		}
+
+		res, err := prompts.GetProgress(taskID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func GetPredicationHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		predicateId := c.Param("predicateId")
+		output, err := prompts.GetPrediction(predicateId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, output)
 	}
 }

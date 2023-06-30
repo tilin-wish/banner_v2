@@ -1,15 +1,13 @@
 package prompts
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
-	"strings"
 
 	"github.com/joho/godotenv"
 	openai "github.com/sashabaranov/go-openai"
@@ -73,11 +71,14 @@ func submitPost(url string, data map[string]interface{}) (*http.Response, error)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.Post(url, "application/json", strings.NewReader(string(jsonData)))
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+	req.Header.Set("Authorization", "Token "+token)
+	req.Header.Set("Content-Type", "application/json")
+	return http.DefaultClient.Do(req)
 }
 
 func saveEncodedImage(b64Image string, outputPath string) error {
@@ -85,51 +86,27 @@ func saveEncodedImage(b64Image string, outputPath string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(outputPath, decodedData, 0644)
+	err = os.WriteFile(outputPath, decodedData, 0644)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GenImage(theme string, maxNum int) {
+type GenImageResponse struct {
+	Prompt string                `json:"prompt"`
+	Task   *SubmitPromptResponse `json:"task"`
+}
+
+func GenImage(theme string) (*GenImageResponse, error) {
 	prompt := GenPrompts(theme)
 	fmt.Println(prompt)
-
-	remoteURL := "http://180.164.99.89:37861/"
-	txt2imgURL := remoteURL + "sdapi/v1/txt2img"
-	data := map[string]interface{}{
-		"prompt":              theme,
-		"negative_prompt":     "((part of the head)), ((((mutated hands and fingers)))), deformed, blurry, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long neck, long body, Octane renderer,lowres, bad anatomy, bad hands, text, missing fingers, worst quality, low quality, normal quality, signature, watermark, blurry,ugly, fat, obese, chubby, (((deformed))), [blurry], bad anatomy, disfigured, poorly drawn face, mutation, mutated, (extra_limb), (ugly), (poorly drawn hands), messy drawing,(2girls), morbid, mutilated, tranny, trans, trannsexual, [out of frame], (bad proportions), octane render, unity, unreal, maya, photorealistic",
-		"num_inference_steps": "30",
-		"samples":             maxNum,
-	}
-
-	response, err := submitPost(txt2imgURL, data)
+	task, err := submitPrompt(prompt)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	defer response.Body.Close()
-
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	var result map[string]interface{}
-	err = json.Unmarshal(responseData, &result)
-	if err != nil {
-		panic(err)
-	}
-
-	images := result["images"].([]interface{})
-	i := 0
-	for _, image := range images {
-		fmt.Println(i)
-		i++
-		err = saveEncodedImage(image.(string), strconv.Itoa(i)+"_wish.png")
-		if err != nil {
-			panic(err)
-		}
-	}
+	return &GenImageResponse{
+		Prompt: prompt,
+		Task:   task,
+	}, nil
 }
