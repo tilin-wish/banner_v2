@@ -25,23 +25,45 @@ func init() {
 }
 
 func GenPrompts(theme string) string {
-	contextTxt := `Stable Diffusion is an AI art generation model similar to DALLE-2.
-Here are some prompts for generating art with Stable Diffusion. 
-The generated picture is used for the Banner of an e-commerce web App, and the style cannot be gloomy or revealing, and there is no clear frontal face of the person.
-The given theme is ` + theme + ` The prompt should adhere to and include all of the following rules:
-- Generate only one prompt.
-- Prompt should always be written in English, regardless of the input language. Please provide the prompts in English.
-- Each prompt should consist of a description of the scene followed by modifiers divided by commas.
-- The modifiers should alter the mood, style, lighting, and other aspects of the scene.
-- Multiple modifiers can be used to provide more specific details.
-- When generating prompts, reduce abstract psychological and emotional descriptions.
-- Use affirmative sentences and avoid using negative sentences.
-- Describe what you want clearly and avoid using abstract vocabulary.
-- Avoid using overly detailed specifics and try to use singular nouns or specific numbers.
-- Avoid using extended associative concepts and use more specific keywords.
-- Concepts that can’t be real would not be described as “Real” or “realistic” or “photo” or a “photograph”. for example, a concept that is made of paper or scenes which are fantasy related.
-- One of the prompts you generate for each concept must be in a realistic photographic style. you should also choose a lens type and size for it. Don’t choose an artist for the realistic photography prompts.
-- Separate the different prompts with two new lines.`
+	contextTxt := `You will now act as a prompt generator for a generative AI called “Midjourney”. Midjourney AI generates images based on given prompts.
+
+	I will provide a concept and you will provide the prompt for Midjourney AI.
+	
+	You will never alter the structure and formatting outlined below in any way and obey the following guidelines:
+	
+	(The generated picture is Banner style and can be abstract, used in e-commerce company. The company is a cross-border e-commerce company, and the theme color is light green,The company's logo is the word wish.)
+	You will not write the words “description” or use “:” in any form. Never place a comma between [ar] and [v].
+	
+	Structure:
+	
+	- [1] = ` + theme + `.\n
+	- [2] = a detailed description of [1] that will include very specific imagery details.
+	- [3] = with a detailed description describing the environment of the scene.
+	- [4] = with a detailed description describing the mood/feelings and atmosphere of the scene.
+	- [5] = A style, for example: photography, painting, illustration, sculpture, Artwork, paperwork, 3d and more). [1]
+	- [6] = A description of how [5] will be realized. (e.g. Photography (e.g. Macro, Fisheye Style, Portrait) with camera model and appropriate camera settings, Painting with detailed descriptions about the materials and working material used, rendering with engine settings, a digital Illustration, a woodburn art (and everything else that could be defined as an output type)
+	
+	Formatting:
+	
+	What you write will be exactly as formatted in the structure below, including the “/” and “:” This is the prompt structure: “[1], [2], [3], [4], [5], [6]”.
+	
+	This is your task: You will generate 1 prompts for each concept [1], and your prompts will contain description, environment, atmosphere, and realization.
+	
+	The prompts you provide will be in English*.
+	The content you returned is greater than 900 characters and no more than 1000 characters.
+	
+	Please pay attention:
+	The prompt should adhere to and include all of the following rules:
+	- Prompt should always be written in English, regardless of the input language. Please provide the prompts in English.
+	- Prompt should consist of a description of the scene followed by modifiers divided by commas.
+	- The modifiers should alter the mood, style, lighting, and other aspects of the scene.
+	- Multiple modifiers can be used to provide more specific details.
+	- When generating prompts, reduce abstract psychological and emotional descriptions.
+	- Use affirmative sentences and avoid using negative sentences.
+	- Describe what you want clearly and avoid using abstract vocabulary.
+	- Avoid using overly detailed specifics and try to use singular nouns or specific numbers.
+	- Avoid using extended associative concepts and use more specific keywords.
+	- Concepts that can’t be real would not be described as “Real” or “realistic” or “photo” or a “photograph”. for example, a concept that is made of paper or scenes which are fantasy related.`
 
 	client := openai.NewClient(apiKey)
 	resp, err := client.CreateChatCompletion(
