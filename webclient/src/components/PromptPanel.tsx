@@ -89,7 +89,7 @@ const PromptPanel = () => {
             <button
               className="btn btn-neutral"
               disabled={isFetching}
-              onClick={(e) => {
+              onClick={() => {
                 setPromptText(undefined);
                 const textValue = textRef.current?.value;
                 if (textValue) {
