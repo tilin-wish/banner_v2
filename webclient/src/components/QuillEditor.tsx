@@ -1,8 +1,19 @@
 import { useMemo } from "react";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useDebouncedCallback } from "use-debounce";
 import useAppState from "../store";
+
+// 自定义文字大小
+const fontSizeAttr = ['10px', '12px', '14px', '16px', '20px', '24px', '36px']
+const Size = Quill.import("attributors/style/size")
+Size.whitelist = fontSizeAttr
+Quill.register(Size, true)
+
+const fontAttr = ["arial", "comic-sans", "courier-new", "georgia", "helvetica", "lucida"]
+const Font = Quill.import('formats/font')
+Font.whitelist = fontAttr
+Quill.register(Font, true);
 
 const QuillEditor = () => {
   const promptText = useAppState((state) => state.promptText);
@@ -31,6 +42,16 @@ const QuillEditor = () => {
               ],
             },
           ],
+          [
+            {
+              size: fontSizeAttr
+            }
+          ],
+          [
+            {
+              font: fontAttr
+            }
+          ]
         ],
       },
       clipboard: {

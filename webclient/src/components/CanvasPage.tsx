@@ -27,7 +27,7 @@ const TextImage = () => {
   useEffect(() => {
     html2canvas(document.querySelector(".ql-editor")!, {
       backgroundColor: null,
-      width: 300,
+      width: 800,
       height: 200,
     })
       .then((canvas) => {
