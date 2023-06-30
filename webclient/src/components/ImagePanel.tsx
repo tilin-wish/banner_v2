@@ -18,6 +18,7 @@ type GetTaskResponse = {
 
 const ImagePanel = () => {
   const taskId = useAppState((state) => state.taskId);
+  const setIndex = useAppState((state) => state.setIndex);
 
   const { data, isFetching } = useQuery({
     queryKey: ["tasks", taskId],
@@ -29,10 +30,9 @@ const ImagePanel = () => {
       );
       return data;
     },
+    refetchOnWindowFocus: false,
     refetchInterval: (data) => (data?.progress !== 100 ? 2000 : false),
   });
-
-  console.log({ progress: data?.progress });
 
   const renderCaption = () => {
     if (isFetching || (data && data.progress !== 100)) {
@@ -54,12 +54,41 @@ const ImagePanel = () => {
       );
     }
     return (
-      <div className="flex h-10 items-center">
-        <p className="label-text text-black font-bold text-lg flex items-center">
-          Pick your favorite image to
-        </p>
+      <div className="flex h-10 items-center gap-1">
+        <span className="label-text text-black font-bold text-lg pr-1">
+          Choose image to customize
+        </span>
         <Link to="/canvas">
-          <button className="btn btn-sm btn-neutral ml-2">Customize</button>
+          <button
+            className="btn btn-neutral btn-sm"
+            onClick={() => setIndex(1)}
+          >
+            1
+          </button>
+        </Link>
+        <Link to="/canvas">
+          <button
+            className="btn btn-neutral btn-sm"
+            onClick={() => setIndex(2)}
+          >
+            2
+          </button>
+        </Link>
+        <Link to="/canvas">
+          <button
+            className="btn btn-neutral btn-sm"
+            onClick={() => setIndex(3)}
+          >
+            3
+          </button>
+        </Link>
+        <Link to="/canvas">
+          <button
+            className="btn btn-neutral btn-sm"
+            onClick={() => setIndex(4)}
+          >
+            4
+          </button>
         </Link>
       </div>
     );

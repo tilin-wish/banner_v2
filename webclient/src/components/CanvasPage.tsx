@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import html2canvas from "html2canvas";
 import { useEffect, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import { Link } from "react-router-dom";
 import useImage from "use-image";
-import imageSrc from "../example.jpeg";
 import useAppState from "../store";
 import PanelContainer from "./PanelContainer";
 import QuillEditor from "./QuillEditor";
 
-const ExampleImage = () => {
-  const [image] = useImage(imageSrc);
+const GeneratedImage = ({ src }: { src: string }) => {
+  const [image] = useImage(src);
   return <Image image={image} width={800} height={600} />;
 };
 
@@ -55,23 +56,69 @@ const TextImage = () => {
   );
 };
 
+type UpscaleResponse = {
+  code: number;
+  task_id: number;
+  progress: number;
+  url: string;
+  filename: string;
+  size: number;
+  width: number;
+  height: number;
+  errmsg: string;
+};
+
 const CanvasPage = () => {
+  const taskId = useAppState((state) => state.taskId);
+  const index = useAppState((state) => state.index);
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["upsace", taskId, index],
+    enabled: !!taskId,
+    retry: false,
+    queryFn: async () => {
+      const { data } = await axios.get<UpscaleResponse>(
+        import.meta.env.VITE_API_BASE +
+          `/api/upscale?task_id=${taskId}&index=${index}`,
+      );
+      return data;
+    },
+    refetchOnWindowFocus: false,
+    refetchInterval: (data) => (data?.progress !== 100 ? 2000 : false),
+  });
+
   return (
     <PanelContainer>
-      <Link to="/">
-        <button className="btn btn-sm btn-neutral">Go Back</button>
-      </Link>
+      <div className="flex gap-2">
+        <Link to="/">
+          <button className="btn btn-sm btn-neutral">Go Back</button>
+        </Link>
+        <button
+          className={`btn btn-sm btn-primary 
+          ${data?.url ? "" : "disabled"}`}
+        >
+          Download
+        </button>
+      </div>
       <div className="w-full flex h-full">
-        {/* Stage - is a div wrapper 
+        {!isFetching ? (
+          /* Stage - is a div wrapper 
           Layer - is an actual 2d canvas element, so you can have several layers inside the stage
           Rect and Circle are not DOM elements. 
-          They are 2d shapes on canvas */}
-        <Stage width={800} height={600}>
-          <Layer>
-            <ExampleImage />
-            <TextImage />
-          </Layer>
-        </Stage>
+          They are 2d shapes on canvas */
+          <Stage width={800} height={600}>
+            {data?.url && (
+              <Layer>
+                <GeneratedImage src={data.url} />
+                <TextImage />
+              </Layer>
+            )}
+          </Stage>
+        ) : (
+          <div className="w-[600px] h-[600px] flex justify-center">
+            <span className="loading loading-spinner text-neutral" />
+          </div>
+        )}
         <QuillEditor />
       </div>
     </PanelContainer>

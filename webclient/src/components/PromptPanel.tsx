@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import useAppState from "../store";
 import PanelContainer from "./PanelContainer";
 
@@ -20,26 +20,31 @@ type SubmitPrompt = {
 };
 
 const PromptPanel = () => {
-  const [text, setText] = useState("");
   const setPromptText = useAppState((state) => state.setPromptText);
   const setPredicationId = useAppState((state) => state.setTaskId);
+  const textRef = useRef<HTMLTextAreaElement>(null);
 
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ["images", text],
+    queryKey: ["images", textRef.current?.value],
     enabled: false,
     retry: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
+      const theme = textRef.current?.value;
+      if (!theme) return;
       const { data } = await axios.post<SubmitPrompt>(
-        import.meta.env.VITE_API_BASE + `/api/images?theme=${text}`,
+        import.meta.env.VITE_API_BASE + `/api/images?theme=${theme}`,
       );
       return data;
     },
   });
 
-  if (data) {
-    setPredicationId(data.task.task_id);
-    setPromptText(data.prompt);
-  }
+  useEffect(() => {
+    if (data) {
+      setPredicationId(data.task.task_id);
+      setPromptText(data.prompt);
+    }
+  }, [setPromptText, setPredicationId, data]);
 
   const renderFooter = () => {
     if (isFetching) {
@@ -65,7 +70,7 @@ const PromptPanel = () => {
     <PanelContainer className="justify-center">
       <div className="h-1/2 gap-2 flex flex-col">
         <span className="label-text text-black font-bold text-lg">
-          Give some keywords to generate promopt
+          Give some keywords to generate prompt
         </span>
         <div className="flex flex-col gap-2">
           <textarea
@@ -73,15 +78,16 @@ const PromptPanel = () => {
             border-2 
           "
             placeholder="type your key word here"
-            onChange={(e) => setText(e.target.value)}
+            ref={textRef}
+            // onChange={(e) => setText(e.target.value)}
           />
           <div className="flex justify-end">
             <button
               className="btn btn-neutral"
               disabled={isFetching}
               onClick={() => {
-                setPromptText(undefined);
                 refetch();
+                setPromptText(undefined);
               }}
             >
               {isFetching ? "Generating" : "Genereate Prompt"}
